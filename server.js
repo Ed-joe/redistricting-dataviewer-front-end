@@ -186,9 +186,9 @@ function querySeatShare() {
 
     Plotly.newPlot('sv-chart', plotly_data, layout);
 
-    document.getElementById('sv-responsiveness').innerHTML = "Responsiveness: " + data.districtPlan.responsiveness;
-    document.getElementById('sv-baf').innerHTML = "Bias at 50%: " + data.districtPlan.biasAt50;
-    document.getElementById('sv-symmetry').innerHTML = "Symmetry: " + data.districtPlan.symmetry;
+    document.getElementById('sv-responsiveness').innerHTML = "Responsiveness: " +  parseFloat(data.districtPlan.responsiveness).toFixed(4);
+    document.getElementById('sv-baf').innerHTML = "Bias at 50%: " + parseFloat(data.districtPlan.biasAt50).toFixed(4);
+    document.getElementById('sv-symmetry').innerHTML = "Symmetry: " + parseFloat(data.districtPlan.symmetry).toFixed(4);
     document.getElementById('sv-header').innerHTML = "Seats-Votes Curve for " + available_plans[selected_plan][1];
   });
 }
