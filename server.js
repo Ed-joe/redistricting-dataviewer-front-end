@@ -26,7 +26,6 @@ function getState(state_code) {
     $(".result").html(data);
     $(function () {
       current_state = state_code;
-      console.log(data);
 
       // Populates summary table with state data
       data.districtPlanMetricsList.forEach(element => {
@@ -38,12 +37,11 @@ function getState(state_code) {
 
       district_plan_data = []
       for (const plan_metrics of data.districtPlanMetricsList) {
-        console.log(plan_metrics);
         plan_metrics.compactness = parseFloat(plan_metrics.compactness).toFixed(2)
         plan_metrics.meanPopulationDeviation = parseFloat(plan_metrics.meanPopulationDeviation).toFixed(2)
         district_plan_data.push(plan_metrics)
       }
-      console.log(district_plan_data)
+
       $('#table').bootstrapTable({
         data: district_plan_data
       });
@@ -57,8 +55,7 @@ function queryPlan(id) {
     plan_stats = data;
   });
   $.get(address + 'district/geojson/' + current_state + '/' + available_plans[id][0], function (data) {
-    console.log("PLAN:")
-    console.log(data);
+
     for (let i = 0; i < data.features.length; i++) {
       democrat = plan_stats[i]["DEMOCRAT"];
       republican = plan_stats[i]["REPUBLICAN"];
@@ -89,7 +86,7 @@ function querySeatShare() {
 
     var x_coordinates_dem = [];
     var y_coordinates_dem = [];
-    console.log(data);
+
     for (const [key, value] of Object.entries(data.districtPlan.democratData)) {
       x_coordinates_dem.push(value.x);
       y_coordinates_dem.push(value.y);
@@ -202,7 +199,6 @@ function queryBoxWhisker(demographic, name) {
   $.get(address + 'district/box-whisker/' + current_state + '/' + available_plans[selected_plan][0], function (data) {
     var seawulf_plots = data.boxAndWhiskerData[demographic];
     var district_plots = data.districtData[demographic];
-    console.log(data);
 
     var final = [];
     const reducer = (accumulator, curr) => accumulator + curr;
@@ -349,11 +345,6 @@ function querySeaWulfStats(metric, demographic = null) {
           xaxis.push(element.republicanSeats + "-" + element.democratSeats);
           yaxis.push(element.count);
         });
-        console.log("Xaxis")
-        console.log(xaxis);
-        console.log("Yaxis")
-        console.log(yaxis);
-
         var chart = [
           {
             x: xaxis,
@@ -383,7 +374,6 @@ function querySeaWulfStats(metric, demographic = null) {
         xaxis = [];
         yaxis = [];
         data[metric].forEach(element => {
-          console.log(element);
           xaxis.push(element.numCombinedMajorityMinorityDistricts);
           yaxis.push(element.count);
         });
