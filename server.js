@@ -327,8 +327,13 @@ function queryComparePlans(id) {
 }
 
 function queryStateShapes() {
+  var loader = document.getElementById('load-sv');
+  console.log("yo")
+  displayLoading(loader);
   $.get(address + 'state/geojson/all', function (data) {
     state_shapes = data;
+    console.log("yo2")
+    hideLoading(loader);
     loadStates();
   });
 }
