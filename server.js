@@ -51,6 +51,7 @@ function getState(state_code) {
 
 function queryPlan(id) {
   selected_plan = id;
+
   $.get(address + 'district/population-metrics/' + current_state + '/' + available_plans[id][0], function (data) {
     plan_stats = data;
   });
@@ -77,12 +78,9 @@ function queryPlan(id) {
 }
 
 function querySeatShare() {
-  var sv_display = document.getElementById('sv-chart');
-  var loader = document.getElementById('load-sv');
-  // displayLoading(loader);
+  // var sv_display = document.getElementById('sv-chart');
 
   $.get(address + 'district/seat-share/' + current_state + '/' + available_plans[selected_plan][0], function (data) {
-    // hideLoading(loader);
 
     var x_coordinates_dem = [];
     var y_coordinates_dem = [];
