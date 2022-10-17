@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+        integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Districting Data Viewer</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css">
+
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.plot.ly/plotly-2.9.0.min.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+        integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"
+        integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
+
+
+
+</head>
+
+<body>
+
+    <div id="seat-vote" class="popup">
+        <div class="popup-header">
+            <span id="sv-header"><b>Seats-Votes Curve</b></span>
+            <span id="sv-close" class="popup-close"
+                onclick="togglePopup(document.getElementById('seat-vote'))">&#10006;</span>
+        </div>
+        <p class="sv-metric" id="sv-responsiveness">Responsiveness:</p>
+        <p class="sv-metric" id="sv-baf">Bias at 50%:</p>
+        <p class="sv-metric" id="sv-symmetry">Symmetry:</p>
+        <div id="sv-chart">
+            <!-- <div id="load-sv" class="loading"></div> -->
+        </div>
+    </div>
+    <div id="compare" class="popup">
+        <div class="popup-header">
+            <span id="sv-header"><b>Plan Comparison</b></span>
+            <span id="sv-close" class="popup-close"
+                onclick="togglePopup(document.getElementById('compare'));">&#10006;</span>
+        </div>
+
+        <div id="compare-picker" class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick = "displayCompareOptions();">
+                Select Plan to Compare:
+            </button>
+            <div id="compare-options" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            </div>
+        </div>
+        <div id="compare-chart">
+        </div>
+    </div>
+    <div id="seawulf" class="popup">
+        <div class="popup-header">
+            <span id="sv-header"><b>Seawulf Statistics</b></span>
+            <span id="sv-close" class="popup-close"
+                onclick="togglePopup(document.getElementById('seawulf'))">&#10006;</span>
+        </div>
+        <!-- <div id="load-seawulf" class="loading"></div> -->
+        <div id="demo-picker" class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Metric
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a onclick="querySeaWulfStats('combinedMajorityMinorityMap');" class="dropdown-item" href="#">Combined
+                    Majority-Minority Map</a>
+                <a onclick="querySeaWulfStats('majorityMinorityRange'); removeSeawulfChart();" class="dropdown-item"
+                    href="#">Majority-Minority Range</a>
+                <a onclick="querySeaWulfStats('compactnessData');" class="dropdown-item" href="#">Compactness</a>
+                <a onclick="querySeaWulfStats('efficiencyGapData');" class="dropdown-item" href="#">Efficiency Gap</a>
+                <a onclick="querySeaWulfStats('republicanDemocratSplit');" class="dropdown-item" href="#">Republican
+                    Democrat Split</a>
+            </div>
+        </div>
+        <div id="demo-seawulf" class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Demographic
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a onclick="querySeaWulfStats('majorityMinorityRange', 'AFRICAN_AMERICAN')" class="dropdown-item"
+                    href="#">African American</a>
+                <a onclick="querySeaWulfStats('majorityMinorityRange', 'AMERICAN_INDIAN')" class="dropdown-item"
+                    href="#">American Indian</a>
+                <a onclick="querySeaWulfStats('majorityMinorityRange', 'ASIAN')" class="dropdown-item" href="#">Asian</a>
+                <a onclick="querySeaWulfStats('majorityMinorityRange', 'HISPANIC_LATINO')" class="dropdown-item"
+                    href="#">Hispanic Latino</a>
+                <a onclick="querySeaWulfStats('majorityMinorityRange', 'PACIFIC_ISLANDER')" class="dropdown-item"
+                    href="#">Pacific Islander</a>
+            </div>
+        </div>
+        <div id="seawulf-chart">
+        </div>
+    </div>
+    <div id="boxplot" class="popup">
+        <div class="popup-header">
+            <span id="sv-header"><b>Box-and-Whisker Diagram</b></span>
+            <span id="sv-close" class="popup-close"
+                onclick="togglePopup(document.getElementById('boxplot'))">&#10006;</span>
+        </div>
+        <div id="demo-picker" class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Demographic
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a onclick="queryBoxWhisker('AFRICAN_AMERICAN', 'African American')" class="dropdown-item"
+                    href="#">African American</a>
+                <a onclick="queryBoxWhisker('AMERICAN_INDIAN', 'American Indian')" class="dropdown-item"
+                    href="#">American Indian</a>
+                <a onclick="queryBoxWhisker('ASIAN', 'Asian')" class="dropdown-item" href="#">Asian</a>
+                <a onclick="queryBoxWhisker('HISPANIC_LATINO', 'Hispanic Latino')" class="dropdown-item"
+                    href="#">Hispanic Latino</a>
+                <a onclick="queryBoxWhisker('PACIFIC_ISLANDER', 'Pacific Islander')" class="dropdown-item"
+                    href="#">Pacific Islander</a>
+                <a onclick="queryBoxWhisker('WHITE', 'White')" class="dropdown-item" href="#">White</a>
+            </div>
+        </div>
+        <div id="boxplot-chart">
+        </div>
+    </div>
+
+
+
+    <nav class="navbar navbar-expand-lg navbar fixed-top">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"
+            aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarToggler">
+            <a class="navbar-brand" href="#">
+                Sparks</a>
+            <button type="button" onClick="resetMap()" class="btn btn-primary mr-1">Home</button>
+            <!-- <button type="button" class="btn btn-primary mr-1"><i class="fa fa-camera"></i> Save Screenshot</button> -->
+
+            <div id="boundry-picker" class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select State
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a onclick="resetMap()" class="dropdown-item" href="#">No State</a>
+                    <a onclick="resetMap(); zoomToFeature(null, 1)" class="dropdown-item" href="#">Illinois</a>
+                    <a onclick="resetMap(); zoomToFeature(null, 0)" class="dropdown-item" href="#">Pennsylvania</a>
+                    <a onclick="resetMap(); zoomToFeature(null, 2)" class="dropdown-item" href="#">Nevada</a>
+                </div>
+            </div>
+            <!-- <div id="boundry-picker" class="dropleft ml-auto">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Boundary Data
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a onclick="editBoundary(0)" class="dropdown-item" href="#">Precincts</a>
+                    <a onclick="editBoundary(1)" class="dropdown-item active" href="#">Existing Congressional
+                        Districts</a>
+                    <a onclick="editBoundary(2)" class="dropdown-item" href="#">Cities/Counties</a>
+                    <a onclick="editBoundary(3)" class="dropdown-item" href="#">Census Blocks</a>
+                </div>
+            </div> -->
+
+        </div>
+    </nav>
+
+    <div id="plans-picker">
+        <div class="tab tab-left">
+            <h2>Available Plans</h2>
+        </div>
+        <div id="available" class="">
+            <div id="picker" class="measure-form">
+                <label id="default-plan" class="container" onclick="loadPlan(0)">
+                    <p>Approved Plan</p>
+                    <input type="radio" checked="checked" name="radio">
+                    <span class="checkmark"></span>
+                </label>
+
+            </div>
+            <button onclick="togglePopup(document.getElementById('seat-vote')); querySeatShare();" type="button"
+                id="showBox" class="btn btn-primary" aria-pressed="false" autocomplete="off">
+                Show Seats-Votes Curve
+            </button>
+            <button onclick="togglePopup(document.getElementById('compare'));" type="button"
+                id="showBox" class="btn btn-primary" aria-pressed="false" autocomplete="off">
+                Compare Plans
+            </button>
+            <button onclick="togglePopup(document.getElementById('seawulf')); removeSeawulfChart();" type="button" id="showBox"
+                class="btn btn-primary" aria-pressed="false" autocomplete="off">
+                Show Seawulf Generated Data
+            </button>
+            <button
+                onclick="togglePopup(document.getElementById('boxplot')); queryBoxWhisker('AFRICAN_AMERICAN', 'African American');"
+                type="button" id="showBox" class="btn btn-primary" aria-pressed="false" autocomplete="off">
+                Toggle Box/Whisker
+            </button>
+        </div>
+    </div>
+
+    <div class="selector">
+        <div class="tab">
+            <h2>Summary of Plans</h2>
+        </div>
+        <div id="PlanSummary" class="">
+            <table id="table" class="table table-striped table-dark">
+                <thead>
+                    <tr>
+                        <th data-field="name" scope="col">Name</th>
+                        <!-- <th data-field="numMinorityMajorityDistricts" scope="col">Maj-Min Districts</th> -->
+                        <th data-field="meanPopulationDeviation" scope="col">μ Pop Dev</th>
+                        <th data-field="compactness" scope="col">Polsby Popper</th>
+                        <th data-field="numMajorityMinorityDistricts" scope="col">Maj-Min</th>
+                        <th data-field="numRepublicanDistricts" scope="col">R</th>
+                        <th data-field="numDemocratDistricts" scope="col">D</th>
+                        <!-- <th data-field="timesAccessed" scope="col"></th> -->
+                    </tr>
+                </thead>
+            </table>
+            
+        </div>
+        <div class="tab">
+            <h2>Popout Workspace</h2>
+        </div>
+            <!--
+            <div id="PlanSummary" class="">
+            <table id="specific" class="table table-striped table-dark">
+                <thead>
+                    <tr>
+                        <th data-field="name" scope="col">Name</th>
+                        <th data-field="meanPopulationDeviation" scope="col">Pop</th>
+                        <th data-field="compactness" scope="col">Polsby Popper</th>
+                        <th data-field="numMajorityMinorityDistricts" scope="col">Maj-Min</th>
+                        <th data-field="numRepublicanDistricts" scope="col">R</th>
+                        <th data-field="numDemocratDistricts" scope="col">D</th>
+                        <th data-field="timesAccessed" scope="col"></th>
+                    </tr>
+                </thead>
+            </table>
+            
+        </div>-->
+    </div>
+    <div id="map"></div>
+</body>
+
+</html>
+
+
+<script src="popup_handler.js"></script>
+<script src="server.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+<script src="helper_functions.js"></script>
+<script src="data_window.js"></script>
+<script src="leaflet.js"></script>
