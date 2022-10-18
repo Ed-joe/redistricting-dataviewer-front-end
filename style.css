@@ -149,7 +149,8 @@ td img {
   border-top: 6px solid var(--primary);
   border-radius: 100%;
   margin: auto;
-  margin-top: 25%;
+  margin-top: 20%;
+  margin-bottom: 25%;
   visibility: hidden;
   animation: spin 1s infinite linear;
 }
