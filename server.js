@@ -12,7 +12,7 @@ var plan_stats;
 
 const plan_base = document.getElementById("default-plan").cloneNode(true);
 const address = "https://continual-math-365420.ue.r.appspot.com/";
-//const address = "http://localhost:8080/";
+// const address = "http://localhost:8080/";
 
 function upper(sentence) {
   return sentence.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
@@ -326,11 +326,9 @@ function queryComparePlans(id) {
 
 function queryStateShapes() {
   var loader = document.getElementById('load-sv');
-  console.log("yo")
   displayLoading(loader);
   $.get(address + 'state/geojson/all', function (data) {
     state_shapes = data;
-    console.log("yo2")
     hideLoading(loader);
     loadStates();
   });
