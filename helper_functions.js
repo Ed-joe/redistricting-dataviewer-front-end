@@ -204,7 +204,7 @@ function zoomToFeature(e, state = null) {
 
 function loadPlan(id) {
     if (selected_plan != id) {
-    
+        
         queryPlan(id);
         // queryBoxWhisker('AFRICAN_AMERICAN', 'African American');
         // querySeatShare();

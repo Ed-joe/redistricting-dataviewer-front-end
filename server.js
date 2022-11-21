@@ -22,6 +22,8 @@ function getState(state_code) {
   current_state = "";
   available_plans = [];
   selected_plan = null;
+  var loader = document.getElementById('load-sv');
+  displayLoading(loader);
   $.get(address + "state/" + state_code, function (data) {
     $(".result").html(data);
     $(function () {
@@ -45,6 +47,7 @@ function getState(state_code) {
       $('#table').bootstrapTable({
         data: district_plan_data
       });
+      hideLoading(loader);
     });
   });
 }
